@@ -1,9 +1,14 @@
 package main
 
+import (
+	"github.com/alex-305/fiestabackend/api"
+	"github.com/alex-305/fiestabackend/db"
+)
+
 func main() {
 
 	/*Open database*/
-	db, err := NewDB()
+	db, err := db.NewDB()
 
 	if err != nil {
 		panic(err)
@@ -12,7 +17,7 @@ func main() {
 	defer db.Close()
 
 	/*Start the server*/
-	server := createAPIServer("localhost:8080", db)
+	server := api.CreateServer("localhost:8080", db)
 	err = server.Start()
 
 	if err != nil {
