@@ -60,14 +60,13 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Invalid Request", http.StatusBadRequest)
 		return
 	}
-
-	db.CreateUser(creds)
-
+	s.db.CreateUser(creds)
 }
 
 func (s *APIServer) Start() error {
 	router := mux.NewRouter()
 	router.HandleFunc("/login", s.handleLogin).Methods(http.MethodPost)
+	router.HandleFunc("/createAccount", s.handleCreateAccount).Methods(http.MethodPost)
 	log.Printf("Server is listening on %s", s.listenAddress)
 
 	corsHandler := handlers.CORS(
