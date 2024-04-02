@@ -11,7 +11,7 @@ import (
 )
 
 func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -24,30 +24,20 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid Request", http.StatusBadRequest)
 		return
 	}
+	err = loginUser(creds, s.db)
 
-	username := creds.Username
-	password := creds.Password
+	if err != nil {
+		http.Error(w, "Invalid username or password: ", http.StatusUnauthorized)
+		return
+	}
 
-	log.Printf("user: %s, password: %s", username, password)
+	log.Printf("Successful login: %s", creds.Username)
 
-	// user, err := s.getUser(username, password)
-
-	// if err != nil {
-	// 	http.Error(w, "Invalid username or password.", http.StatusUnauthorized)
-	// 	return
-	// }
-	// hashedPassword := hashPassword(password)
-
-	// if user.password != hashedPassword {
-	// 	http.Error(w, "Invalid username or password", http.StatusUnauthorized)
-	// 	return
-	// }
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 }
 
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -60,7 +50,12 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Invalid Request", http.StatusBadRequest)
 		return
 	}
-	s.db.CreateUser(creds)
+	err = s.db.CreateUser(creds)
+	if err != nil {
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *APIServer) Start() error {

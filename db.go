@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"log"
 	"net/url"
 
 	_ "github.com/lib/pq"
@@ -26,8 +27,6 @@ func NewDB() (*DB, error) {
 		return nil, err
 	}
 
-	defer db.Close()
-
 	/*Ping the database*/
 	err = db.Ping()
 
@@ -40,7 +39,6 @@ func NewDB() (*DB, error) {
 func (db *DB) Close() error {
 	return db.DB.Close()
 }
-
 func (db *DB) CreateUser(cred models.Credentials) error {
 	var err error
 	cred.Password, err = hashPassword(cred.Password)
@@ -51,28 +49,25 @@ func (db *DB) CreateUser(cred models.Credentials) error {
 
 	stmt := `
 	INSERT INTO users(username, password)
-	VALUES($1,$2)`
+	VALUES($1,$2);`
 
 	_, err = db.Exec(stmt, cred.Username, cred.Password)
 
 	if err != nil {
+		log.Printf("Error in insert: %v", err)
 		return err
 	}
 
 	return nil
 }
 
-func (s *APIServer) getUser(username, password string) (*models.Credentials, error) {
-
-	var user models.Credentials
-	var err error
-	//err := db.QueryRow("SELECT id, username, password FROM users WHERE username = $1", username).Scan(&user.ID, &user.username, &user.password)
+func (db *DB) GetPassword(username string) (string, error) {
+	var password string
+	err := db.QueryRow("SELECT password FROM users WHERE username = $1", username).Scan(&password)
+	log.Printf("dbpass: %s", password)
 	if err != nil {
-		if err != sql.ErrNoRows {
-			return nil, err
-		}
-		return nil, err
+		return "", err
 	}
 
-	return &user, err
+	return password, nil
 }
