@@ -9,6 +9,7 @@ import (
 	"github.com/alex-305/fiestabackend/db"
 	"github.com/alex-305/fiestabackend/models"
 	"github.com/golang-jwt/jwt"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -51,10 +52,14 @@ func CreateUser(creds models.Credentials, db *db.DB) error {
 
 func GenerateJWT(username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", errors.New("failure to create jwt claim")
+	}
 	claims["username"] = username
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
+	godotenv.Load()
 	SecretKey := os.Getenv("SECRET_KEY")
 
 	if SecretKey == "" {
