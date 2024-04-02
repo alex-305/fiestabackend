@@ -3,6 +3,8 @@ package main
 import (
 	"database/sql"
 	"net/url"
+
+	"github.com/alex-305/fiestabackend/models"
 )
 
 type DB struct {
@@ -37,7 +39,7 @@ func (db *DB) Close() error {
 	return db.DB.Close()
 }
 
-func (db *DB) CreateUser(cred Credentials) error {
+func (db *DB) CreateUser(cred models.Credentials) error {
 	var err error
 	cred.Password, err = hashPassword(cred.Password)
 
@@ -58,9 +60,9 @@ func (db *DB) CreateUser(cred Credentials) error {
 	return nil
 }
 
-func (s *APIServer) getUser(username, password string) (*Credentials, error) {
+func (s *APIServer) getUser(username, password string) (*models.Credentials, error) {
 
-	var user Credentials
+	var user models.Credentials
 	var err error
 	//err := db.QueryRow("SELECT id, username, password FROM users WHERE username = $1", username).Scan(&user.ID, &user.username, &user.password)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/alex-305/fiestabackend/models"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -16,7 +17,7 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	var creds Credentials
+	var creds models.Credentials
 	err := json.NewDecoder(r.Body).Decode(&creds)
 
 	if err != nil {
@@ -52,7 +53,7 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	var creds Credentials
+	var creds models.Credentials
 	err := json.NewDecoder(r.Body).Decode(&creds)
 
 	if err != nil {
