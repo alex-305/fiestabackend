@@ -1,2 +1,6 @@
-[^.]*
-*.env
+/fiestabackend
+*.*
+
+#Excluded from the ignore
+!.gitignore
+!*/
