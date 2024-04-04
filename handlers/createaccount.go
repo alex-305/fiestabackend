@@ -22,7 +22,7 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Invalid Request", http.StatusBadRequest)
 		return
 	}
-	err = s.DB.CreateUser(creds)
+	err = auth.CreateUser(creds, s.DB)
 	if err != nil {
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return

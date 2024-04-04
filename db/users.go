@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"log"
 
 	"github.com/alex-305/fiestabackend/models"
@@ -30,4 +31,26 @@ func (db *DB) GetPassword(username string) (string, error) {
 	}
 
 	return password, nil
+}
+
+func (db *DB) GetUser(username string) (models.User, error) {
+
+	row := db.QueryRow("SELECT username, description, join_date FROM users WHERE username = $1", username)
+
+	var user models.User
+	var description sql.NullString
+	err := row.Scan(&user.Username, &description, &user.Join_date)
+
+	if description.Valid {
+		user.Description = description.String
+	} else {
+		user.Description = ""
+	}
+
+	if err != nil {
+		log.Printf("%s", err)
+		return models.User{}, err
+	}
+
+	return user, nil
 }

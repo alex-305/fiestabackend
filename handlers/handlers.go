@@ -16,8 +16,12 @@ type APIServer struct {
 
 func (s *APIServer) Start() error {
 	router := mux.NewRouter()
+
 	router.HandleFunc("/login", s.handleLogin).Methods(http.MethodPost)
 	router.HandleFunc("/createAccount", s.handleCreateAccount).Methods(http.MethodPost)
+	router.HandleFunc("/user/{username}", s.handleUser).Methods(http.MethodGet)
+	router.HandleFunc("/auth/verify", s.handleVerifyAuth).Methods(http.MethodGet)
+
 	log.Printf("Server is listening on %s", s.ListenAddress)
 
 	corsHandler := handlers.CORS(
