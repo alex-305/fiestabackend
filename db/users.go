@@ -60,3 +60,18 @@ func (db *DB) GetUser(username string) (models.User, error) {
 
 	return user, nil
 }
+
+func (db *DB) UpdateDescription(username, description string) error {
+	stmt, err := db.Prepare("UPDATE users SET description = $1 WHERE username = $2")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(description, username)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}

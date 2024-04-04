@@ -49,3 +49,48 @@ func (s *APIServer) handleUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(userJSON)
 }
+
+type UserUpdate struct {
+	Description string `json:"Description"`
+}
+
+func (s *APIServer) handleUserUpdate(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	username := vars["username"]
+
+	log.Printf("handling user: %s", username)
+	log.Printf("vars: %s", vars)
+
+	token, err := helpers.GetToken(r)
+
+	if err != nil {
+		http.Error(w, "No JWT token found", http.StatusUnauthorized)
+		log.Printf("%s", err)
+		return
+	}
+
+	user, err := auth.ValidateToken(token, s.DB)
+
+	if err != nil {
+		http.Error(w, "Invalid JWT token", http.StatusUnauthorized)
+		log.Printf("%s", err)
+		return
+	}
+	var userUpdate UserUpdate
+
+	err = json.NewDecoder(r.Body).Decode(&userUpdate)
+
+	if err != nil {
+		http.Error(w, "Could not find new value for description", http.StatusBadRequest)
+		log.Printf("%s", err)
+		return
+	}
+
+	err = s.DB.UpdateDescription(user.Username, userUpdate.Description)
+
+	if err != nil {
+		http.Error(w, "Database could not successfully update", http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

@@ -21,6 +21,11 @@ func (s *APIServer) Start() error {
 	router.HandleFunc("/createAccount", s.handleCreateAccount).Methods(http.MethodPost)
 	router.HandleFunc("/user/{username}", s.handleUser).Methods(http.MethodGet)
 	router.HandleFunc("/auth/verify", s.handleVerifyAuth).Methods(http.MethodGet)
+	router.HandleFunc("/user/{username}/update", s.handleUserUpdate).Methods(http.MethodPost)
+
+	router.HandleFunc("/fiesta/create", s.handleCreateFiesta).Methods(http.MethodPost)
+	router.HandleFunc("/fiesta/{fiestaID}", s.handleFiesta).Methods(http.MethodGet)
+	router.HandleFunc("/fiesta/{fiestaID}/comment", s.handleFiestaComment).Methods(http.MethodPost)
 
 	log.Printf("Server is listening on %s", s.ListenAddress)
 
