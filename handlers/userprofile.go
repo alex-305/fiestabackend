@@ -28,14 +28,10 @@ func (s *APIServer) handleUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, "Could not find user", http.StatusBadRequest)
+		return
 	}
 
-	token, err := helpers.GetToken(r)
-
-	if err != nil {
-		// 	http.Error(w, "Could not find jwt token", http.StatusForbidden)
-	}
-
+	token, _ := helpers.GetToken(r)
 	canEdit := auth.IsUser(username, token, s.DB)
 
 	var userProf userProfile = userProfile{
@@ -47,6 +43,7 @@ func (s *APIServer) handleUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, "Could not parse JSON", http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

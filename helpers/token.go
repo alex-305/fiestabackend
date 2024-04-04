@@ -7,7 +7,6 @@ import (
 )
 
 func GetToken(r *http.Request) (string, error) {
-
 	authHeader := r.Header.Get("Authorization")
 
 	if authHeader == "" {

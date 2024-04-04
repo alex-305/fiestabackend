@@ -7,13 +7,19 @@ import (
 	"github.com/alex-305/fiestabackend/models"
 )
 
-func (db *DB) CreateUser(cred models.Credentials) error {
+func (db *DB) CreateUser(creds models.Credentials) error {
+
+	_, err := db.GetUser(creds.Username)
+
+	if err == nil {
+		return err
+	}
 
 	stmt := `
 	INSERT INTO users(username, password)
 	VALUES($1,$2);`
 
-	_, err := db.Exec(stmt, cred.Username, cred.Password)
+	_, err = db.Exec(stmt, creds.Username, creds.Password)
 
 	if err != nil {
 		return err
