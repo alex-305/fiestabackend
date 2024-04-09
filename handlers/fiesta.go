@@ -163,7 +163,7 @@ func (s *APIServer) handleRecentFiestas(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	fiestas, err := s.DB.GetRecentFiestas(username)
+	fiestas, err := s.DB.GetLatestFiestas(username)
 
 	if err != nil {
 		log.Printf("%s", err)
