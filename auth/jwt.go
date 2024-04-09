@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"log"
 	"os"
 	"time"
 
@@ -51,12 +52,14 @@ func ValidateToken(token string, db *db.DB) (models.User, error) {
 	})
 
 	if err != nil {
+		log.Printf("%s", err)
 		return models.User{}, err
 	}
 
 	user, err := db.GetUser(claims.Username)
 
 	if err != nil {
+		log.Printf("%s", err)
 		return models.User{}, err
 	}
 

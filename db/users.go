@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/alex-305/fiestabackend/models"
@@ -12,14 +13,14 @@ func (db *DB) CreateUser(creds models.Credentials) error {
 	_, err := db.GetUser(creds.Username)
 
 	if err == nil {
-		return err
+		return errors.New("user already exists")
 	}
 
-	stmt := `
+	query := `
 	INSERT INTO users(username, password)
 	VALUES($1,$2);`
 
-	_, err = db.Exec(stmt, creds.Username, creds.Password)
+	_, err = db.Exec(query, creds.Username, creds.Password)
 
 	if err != nil {
 		return err
@@ -62,13 +63,13 @@ func (db *DB) GetUser(username string) (models.User, error) {
 }
 
 func (db *DB) UpdateDescription(username, description string) error {
-	stmt, err := db.Prepare("UPDATE users SET description = $1 WHERE username = $2")
+	query, err := db.Prepare("UPDATE users SET description = $1 WHERE username = $2")
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
+	defer query.Close()
 
-	_, err = stmt.Exec(description, username)
+	_, err = query.Exec(description, username)
 
 	if err != nil {
 		return err

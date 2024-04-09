@@ -16,7 +16,11 @@ type userProfile struct {
 	CanEdit bool
 }
 
-func (s *APIServer) handleUser(w http.ResponseWriter, r *http.Request) {
+func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
 	vars := mux.Vars(r)
 	username := vars["username"]
@@ -55,6 +59,12 @@ type UserUpdate struct {
 }
 
 func (s *APIServer) handleUserUpdate(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	vars := mux.Vars(r)
 	username := vars["username"]
 
