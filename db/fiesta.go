@@ -91,39 +91,75 @@ func (db *DB) GetFiesta(fiestaDetails models.FiestaDetails) (models.Fiesta, erro
 	return fiesta, nil
 }
 
-func (db *DB) GetUserFiestas(username string) ([]models.Fiesta, error) {
+func (db *DB) GetUserFiestas(username string) ([]models.SmallFiesta, error) {
 
-	query := `SELECT f.title, f.id, f.post_date as post_date, i.url
+	query := `SELECT f.title, f.username, f.id, i.url
 	FROM fiestas f
 	JOIN (SELECT fiestaid, url,
 	ROW_NUMBER() OVER (PARTITION BY fiestaid ORDER BY url) AS row_num
 	FROM images)
 	i ON f.id = i.fiestaid AND i.row_num=1
-	WHERE f.username = 'adrian'
-	ORDER BY post_date ASC
+	WHERE f.username = $1
+	ORDER BY post_date DESC
 	LIMIT 20;`
 
 	rows, err := db.Query(query, username)
 
 	if err != nil {
-		return []models.Fiesta{}, err
+		return []models.SmallFiesta{}, err
 	}
 
 	defer rows.Close()
 
-	var fiestas []models.Fiesta
+	var fiestas []models.SmallFiesta
 
 	for rows.Next() {
-		var fiesta models.Fiesta
+		var fiesta models.SmallFiesta
 
-		err := rows.Scan(&fiesta.Title, &fiesta.ID, &fiesta.Post_date, fiesta.Images[0])
+		err := rows.Scan(&fiesta.Title, &fiesta.Username, &fiesta.ID, &fiesta.CoverImageURL)
 
 		fiesta.Username = username
 
 		fiestas = append(fiestas, fiesta)
 
 		if err != nil {
-			return []models.Fiesta{}, err
+			return []models.SmallFiesta{}, err
+		}
+	}
+
+	return fiestas, nil
+}
+
+func (db *DB) GetRecentFiestas(username string) ([]models.SmallFiesta, error) {
+	query := `SELECT f.title, f.username, f.id, i.url
+	FROM fiestas f
+	JOIN (SELECT fiestaid, url,
+	ROW_NUMBER() OVER (PARTITION BY fiestaid ORDER BY url) AS row_num
+	FROM images)
+	i ON f.id = i.fiestaid AND i.row_num=1
+	WHERE username <> $1
+	ORDER BY post_date DESC
+	LIMIT 20;`
+
+	rows, err := db.Query(query, username)
+
+	if err != nil {
+		return []models.SmallFiesta{}, err
+	}
+
+	defer rows.Close()
+
+	var fiestas []models.SmallFiesta
+
+	for rows.Next() {
+		var fiesta models.SmallFiesta
+
+		err := rows.Scan(&fiesta.Title, &fiesta.Username, &fiesta.ID, &fiesta.CoverImageURL)
+
+		fiestas = append(fiestas, fiesta)
+
+		if err != nil {
+			return []models.SmallFiesta{}, err
 		}
 	}
 

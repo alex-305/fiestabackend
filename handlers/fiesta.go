@@ -129,6 +129,7 @@ func (s *APIServer) handleGetUserFiestas(w http.ResponseWriter, r *http.Request)
 	fiestas, err := s.DB.GetUserFiestas(username)
 
 	if err != nil {
+		log.Printf("%s", err)
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
 	}
@@ -136,6 +137,7 @@ func (s *APIServer) handleGetUserFiestas(w http.ResponseWriter, r *http.Request)
 	fiestasJSON, err := json.Marshal(fiestas)
 
 	if err != nil {
+		log.Printf("%s", err)
 		http.Error(w, "Response JSON could not be parsed", http.StatusInternalServerError)
 		return
 	}
@@ -143,4 +145,40 @@ func (s *APIServer) handleGetUserFiestas(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(fiestasJSON)
 
+}
+
+func (s *APIServer) handleRecentFiestas(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token, err := helpers.GetToken(r)
+	username := ""
+
+	if err == nil {
+		user, err := auth.ValidateToken(token, s.DB)
+		if err == nil {
+			username = user.Username
+		}
+	}
+
+	fiestas, err := s.DB.GetRecentFiestas(username)
+
+	if err != nil {
+		log.Printf("%s", err)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	fiestasJSON, err := json.Marshal(fiestas)
+
+	if err != nil {
+		log.Printf("%s", err)
+		http.Error(w, "Response JSON could not be parsed", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(fiestasJSON)
 }

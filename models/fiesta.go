@@ -15,3 +15,10 @@ type FiestaDetails struct {
 	Username string
 	FiestaID string
 }
+
+type SmallFiesta struct {
+	Title         string `json:"title"`
+	ID            string `json:"id"`
+	Username      string `json:"username"`
+	CoverImageURL string `json:"coverimage"`
+}

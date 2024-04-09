@@ -24,6 +24,7 @@ func (s *APIServer) Start() error {
 	router.HandleFunc("/user/{username}/update", s.handleUserUpdate).Methods(http.MethodPost)
 	//Fiesta Endpoints
 	router.HandleFunc("/fiesta", s.handlePostFiesta).Methods(http.MethodPost)
+	router.HandleFunc("/fiesta", s.handleRecentFiestas).Methods(http.MethodGet)
 	router.HandleFunc("/user/{username}/fiesta/{fiestaID}", s.handleGetFiesta).Methods(http.MethodGet)
 	router.HandleFunc("/fiesta/{fiestaID}/comment", s.handleFiestaComment).Methods(http.MethodPost)
 	router.HandleFunc("/user/{username}/fiesta", s.handleGetUserFiestas).Methods(http.MethodGet)
@@ -31,6 +32,8 @@ func (s *APIServer) Start() error {
 	router.HandleFunc("/image", s.handlePostImage).Methods(http.MethodPost)
 	router.HandleFunc("/image/{imageURL}", s.handleRemoveImage).Methods(http.MethodDelete)
 	router.HandleFunc("/image/{imageURL}", s.handleGetImage).Methods(http.MethodGet)
+	//User action endpoints
+	router.HandleFunc("/user/follows/{followee}", s.handlePostFollow).Methods(http.MethodPost)
 
 	log.Printf("Server is listening on %s", s.ListenAddress)
 
