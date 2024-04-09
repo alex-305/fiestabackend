@@ -1,6 +1,10 @@
 /fiestabackend
-.*
+*.png
+*.jpeg
+*.jpg
+*.
 uploads/
+.env
 
 #Excluded from the ignore
 !.gitignore
