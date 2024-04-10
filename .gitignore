@@ -1,8 +1,5 @@
 /fiestabackend
-*.png
-*.jpeg
-*.jpg
-*.
+.*
 uploads/
 uploads/images/
 uploads/images/*
