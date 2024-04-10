@@ -147,7 +147,7 @@ func (s *APIServer) handleGetUserFiestas(w http.ResponseWriter, r *http.Request)
 
 }
 
-func (s *APIServer) handleRecentFiestas(w http.ResponseWriter, r *http.Request) {
+func (s *APIServer) handleGetFiestaList(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -163,7 +163,19 @@ func (s *APIServer) handleRecentFiestas(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	fiestas, err := s.DB.GetLatestFiestas(username)
+	vars := mux.Vars(r)
+	listType := vars["type"]
+
+	var fiestas []models.SmallFiesta
+
+	switch listType {
+
+	case "following":
+		fiestas, err = s.DB.GetFollowingFiestas(username)
+	case "latest":
+		fiestas, err = s.DB.GetLatestFiestas(username)
+
+	}
 
 	if err != nil {
 		log.Printf("%s", err)

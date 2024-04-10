@@ -8,19 +8,6 @@ import (
 	"github.com/alex-305/fiestabackend/models"
 )
 
-func (db *DB) IsUserFollowing(follower, followee string) bool {
-	query := `
-	SELECT follower
-	FROM user_follows_user
-	WHERE follower = $1
-	AND followee = $2`
-	var follow string
-	err := db.QueryRow(query, follower, followee).Scan(&follow)
-
-	return err == nil
-
-}
-
 func (db *DB) CreateUser(creds models.Credentials) error {
 
 	_, err := db.GetUser(creds.Username)
@@ -87,34 +74,5 @@ func (db *DB) UpdateDescription(username, description string) error {
 	if err != nil {
 		return err
 	}
-	return nil
-}
-
-func (db *DB) UserFollowsUser(follower, followee string) error {
-	query := `
-	INSERT into user_follows_user(follower, followee)
-	VALUES($1,$2);
-	`
-	_, err := db.Exec(query, follower, followee)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *DB) UserUnfollowsUser(follower, followee string) error {
-	query := `
-	DELETE FROM user_follows_user
-	WHERE follower = $1
-	AND followee = $2;
-	`
-	_, err := db.Exec(query, follower, followee)
-
-	if err != nil {
-		return err
-	}
-
 	return nil
 }

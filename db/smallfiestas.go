@@ -1,7 +1,8 @@
 package db
 
 import (
-	"github.com/alex-305/fiestabackend/helpers"
+	"database/sql"
+
 	"github.com/alex-305/fiestabackend/models"
 )
 
@@ -17,7 +18,7 @@ func (db *DB) GetUserFiestas(username string) ([]models.SmallFiesta, error) {
 	ORDER BY post_date DESC
 	LIMIT 20;`
 
-	return helpers.GetSmallFiestaList(query, username, db.DB)
+	return GetFiestaList(query, username, db.DB)
 }
 
 func (db *DB) GetLatestFiestas(username string) ([]models.SmallFiesta, error) {
@@ -31,7 +32,7 @@ func (db *DB) GetLatestFiestas(username string) ([]models.SmallFiesta, error) {
 	ORDER BY post_date DESC
 	LIMIT 20;`
 
-	return helpers.GetSmallFiestaList(query, username, db.DB)
+	return GetFiestaList(query, username, db.DB)
 }
 
 func (db *DB) GetFollowingFiestas(username string) ([]models.SmallFiesta, error) {
@@ -47,5 +48,31 @@ func (db *DB) GetFollowingFiestas(username string) ([]models.SmallFiesta, error)
 	ORDER BY post_date DESC
 	LIMIT 20;`
 
-	return helpers.GetSmallFiestaList(query, username, db.DB)
+	return GetFiestaList(query, username, db.DB)
+}
+
+func GetFiestaList(query, username string, db *sql.DB) ([]models.SmallFiesta, error) {
+	rows, err := db.Query(query, username)
+
+	if err != nil {
+		return []models.SmallFiesta{}, err
+	}
+
+	defer rows.Close()
+
+	var fiestas []models.SmallFiesta
+
+	for rows.Next() {
+		var fiesta models.SmallFiesta
+
+		err := rows.Scan(&fiesta.Title, &fiesta.Username, &fiesta.ID, &fiesta.CoverImageURL)
+
+		fiestas = append(fiestas, fiesta)
+
+		if err != nil {
+			return []models.SmallFiesta{}, err
+		}
+	}
+
+	return fiestas, nil
 }

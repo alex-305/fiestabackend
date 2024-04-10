@@ -15,7 +15,7 @@ func (s *APIServer) defineRoutes(router *mux.Router) {
 	router.HandleFunc("/user/{username}/update", s.handleUserUpdate).Methods(http.MethodPost)
 	//Fiesta Endpoints
 	router.HandleFunc("/fiesta", s.handlePostFiesta).Methods(http.MethodPost)
-	router.HandleFunc("/fiesta", s.handleRecentFiestas).Methods(http.MethodGet)
+	router.HandleFunc("/fiesta/{type}", s.handleGetFiestaList).Methods(http.MethodGet)
 	router.HandleFunc("/user/{username}/fiesta/{fiestaID}", s.handleGetFiesta).Methods(http.MethodGet)
 	router.HandleFunc("/fiesta/{fiestaID}/comment", s.handleFiestaComment).Methods(http.MethodPost)
 	router.HandleFunc("/user/{username}/fiesta", s.handleGetUserFiestas).Methods(http.MethodGet)
@@ -25,4 +25,5 @@ func (s *APIServer) defineRoutes(router *mux.Router) {
 	router.HandleFunc("/image/{imageURL}", s.handleGetImage).Methods(http.MethodGet)
 	//User action endpoints
 	router.HandleFunc("/user/follows/{followee}", s.handlePostFollow).Methods(http.MethodPost)
+	router.HandleFunc("/fiesta/{fiestaid}/like", s.handlePostLike).Methods(http.MethodPost)
 }
