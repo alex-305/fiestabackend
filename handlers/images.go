@@ -82,6 +82,7 @@ func (s *APIServer) handleRemoveImage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("%s", err)
 		http.Error(w, "Could not find image", http.StatusNotFound)
+		return
 	}
 
 	err = s.DB.DeleteImage(image)

@@ -37,7 +37,6 @@ func CreateUser(creds models.Credentials, db *db.DB) error {
 	err = db.CreateUser(newUser)
 
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	return nil

@@ -101,7 +101,17 @@ func (s *APIServer) handleGetFiesta(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token, _ := helpers.GetToken(r)
-	fiesta.CanEdit = auth.IsUser(username, token, s.DB)
+	user, err := auth.ValidateToken(token, s.DB)
+
+	fiesta.LikeCount = s.DB.LikeCount(fiestaID)
+
+	if err != nil {
+		fiesta.UserLiked = false
+		fiesta.CanEdit = false
+	} else {
+		fiesta.UserLiked = s.DB.DidUserLike(user.Username, fiestaID)
+		fiesta.CanEdit = username == user.Username
+	}
 
 	jsonResponse, err := json.Marshal(fiesta)
 

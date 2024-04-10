@@ -68,6 +68,7 @@ func (s *APIServer) handlePostLike(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.ValidateToken(token, s.DB)
 
 	if err != nil {
+		log.Printf("%s", err)
 		http.Error(w, "Could not validate JWT token", http.StatusUnauthorized)
 		return
 	}
