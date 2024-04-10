@@ -4,6 +4,7 @@
 *.jpg
 *.
 uploads/
+uploads/images/
 .env
 
 #Excluded from the ignore
