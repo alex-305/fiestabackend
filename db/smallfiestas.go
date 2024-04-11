@@ -8,7 +8,7 @@ import (
 
 func (db *DB) GetUserFiestas(username string) ([]models.SmallFiesta, error) {
 
-	query := `SELECT f.title, f.username, f.id, i.url
+	query := `SELECT f.title, f.username, f.id, f.post_date, i.url
 	FROM fiestas f
 	JOIN (SELECT fiestaid, url,
 	ROW_NUMBER() OVER (PARTITION BY fiestaid ORDER BY url) AS row_num
@@ -22,7 +22,7 @@ func (db *DB) GetUserFiestas(username string) ([]models.SmallFiesta, error) {
 }
 
 func (db *DB) GetLatestFiestas(username string) ([]models.SmallFiesta, error) {
-	query := `SELECT f.title, f.username, f.id, i.url
+	query := `SELECT f.title, f.username, f.id, f.post_date, i.url
 	FROM fiestas f
 	JOIN (SELECT fiestaid, url,
 	ROW_NUMBER() OVER (PARTITION BY fiestaid ORDER BY url) AS row_num
@@ -36,7 +36,7 @@ func (db *DB) GetLatestFiestas(username string) ([]models.SmallFiesta, error) {
 }
 
 func (db *DB) GetFollowingFiestas(username string) ([]models.SmallFiesta, error) {
-	query := `SELECT f.title, f.username, f.id, i.url
+	query := `SELECT f.title, f.username, f.id, f.post_date, i.url
 	FROM fiestas f
 	JOIN user_follows_user as fl ON f.username = fl.followee
 	JOIN (
@@ -65,7 +65,7 @@ func GetFiestaList(query, username string, db *sql.DB) ([]models.SmallFiesta, er
 	for rows.Next() {
 		var fiesta models.SmallFiesta
 
-		err := rows.Scan(&fiesta.Title, &fiesta.Username, &fiesta.ID, &fiesta.CoverImageURL)
+		err := rows.Scan(&fiesta.Title, &fiesta.Username, &fiesta.ID, &fiesta.PostDate, &fiesta.CoverImageURL)
 
 		fiestas = append(fiestas, fiesta)
 
