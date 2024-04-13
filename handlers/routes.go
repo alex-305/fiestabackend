@@ -26,6 +26,10 @@ func (s *APIServer) defineRoutes(router *mux.Router) {
 	router.HandleFunc("/user/follows/{followee}", s.handlePostFollow).Methods(http.MethodPost)
 	//Like Endpoints
 	router.HandleFunc("/fiesta/{fiestaid}/like", s.handlePostLike).Methods(http.MethodPost)
+	//Post Permissions
+	router.HandleFunc("/fiesta/{fiestaid}/permissions", s.handlePostPermissions).Methods(http.MethodPost)
+	router.HandleFunc("/fiesta/{fiestaid}/permissions", s.handleGetPermissions).Methods(http.MethodGet)
+	router.HandleFunc("/fiesta/{fiestaid}/permissions/{username}", s.handleDeletePermissions).Methods(http.MethodDelete)
 	//Comment Endpoints
 	router.HandleFunc("/fiesta/{fiestaid}/comments", s.handleGetComments).Methods(http.MethodGet)
 	router.HandleFunc("/fiesta/{fiestaID}/comments", s.handlePostComment).Methods(http.MethodPost)

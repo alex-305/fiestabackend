@@ -2,19 +2,15 @@ package db
 
 import "github.com/alex-305/fiestabackend/models"
 
-func (db *DB) AddImage(image models.Image) error {
-
-	_, err := db.GetUser(image.Username)
-
-	if err != nil {
-		return err
+func (db *DB) AddImage(image models.Image, fiestaid string) error {
+	var err error
+	if fiestaid == "" {
+		_, err = db.Exec(`INSERT INTO images(username, url) 
+		VALUES($1, $2)`, image.Username, image.Url)
+	} else {
+		_, err = db.Exec(`INSERT INTO images(username, url, fiestaid)
+		VALUES($1, $2, $3)`, image.Username, image.Url, fiestaid)
 	}
-
-	query := `
-	INSERT INTO images(username, url)
-	VALUES($1, $2);
-	`
-	_, err = db.Exec(query, image.Username, image.Url)
 
 	if err != nil {
 		return err
@@ -24,11 +20,6 @@ func (db *DB) AddImage(image models.Image) error {
 }
 
 func (db *DB) DeleteImage(image models.Image) error {
-	_, err := db.GetUser(image.Username)
-
-	if err != nil {
-		return err
-	}
 
 	query := `
 	DELETE FROM images
@@ -36,7 +27,7 @@ func (db *DB) DeleteImage(image models.Image) error {
 	AND url = $2;
 	`
 
-	_, err = db.Exec(query, image.Username, image.Url)
+	_, err := db.Exec(query, image.Username, image.Url)
 
 	if err != nil {
 		return err

@@ -117,6 +117,14 @@ func (s *APIServer) handlePostImage(w http.ResponseWriter, r *http.Request) {
 
 	user, err := auth.ValidateToken(token, s.DB)
 
+	fiestaid := r.FormValue("fiestaid")
+	if fiestaid != "" {
+		perms := auth.GetPermissions(user.Username, fiestaid, s.DB)
+		if !perms.IsOwner && !perms.CanPost {
+			http.Error(w, "User is not authorized", http.StatusUnauthorized)
+		}
+	}
+
 	if err != nil {
 		log.Printf("%s", err)
 		http.Error(w, "Could not validate token", http.StatusUnauthorized)
@@ -165,7 +173,7 @@ func (s *APIServer) handlePostImage(w http.ResponseWriter, r *http.Request) {
 		Url:      filename,
 	}
 
-	err = s.DB.AddImage(imgFile)
+	err = s.DB.AddImage(imgFile, fiestaid)
 
 	if err != nil {
 		http.Error(w, "Error saving file", http.StatusInternalServerError)

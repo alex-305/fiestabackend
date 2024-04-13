@@ -8,7 +8,8 @@ type Fiesta struct {
 	Username  string    `json:"username"`
 	Images    []string  `json:"images"`
 	Post_date time.Time `json:"post_date"`
-	CanEdit   bool      `json:"can_edit"`
+	IsOwner   bool      `json:"is_owner"`
+	CanPost   bool      `json:"can_post"`
 	UserLiked bool      `json:"userliked"`
 	LikeCount int       `json:"likecount"`
 }

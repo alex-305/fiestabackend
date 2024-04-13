@@ -87,32 +87,26 @@ func (s *APIServer) handleGetFiesta(w http.ResponseWriter, r *http.Request) {
 
 	fiesta, err := s.DB.GetFiesta(fiestaDetails)
 
-	log.Printf("title:%s", fiesta.Title)
-	log.Printf("post_date:%s", fiesta.Post_date)
-
-	for index := range fiesta.Images {
-		log.Printf(fiesta.Images[index])
-	}
-
 	if err != nil {
 		log.Printf("%s", err)
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
 	}
-
 	token, _ := helpers.GetToken(r)
 	user, err := auth.ValidateToken(token, s.DB)
 
-	fiesta.LikeCount = s.DB.LikeCount(fiestaID)
-
 	if err != nil {
 		fiesta.UserLiked = false
-		fiesta.CanEdit = false
+		fiesta.IsOwner = false
+		fiesta.CanPost = false
 	} else {
 		fiesta.UserLiked = s.DB.DidUserLike(user.Username, fiestaID)
-		fiesta.CanEdit = username == user.Username
+		fiesta.IsOwner = s.DB.IsOwner(user.Username, fiestaID)
+		fiesta.CanPost = s.DB.HasPermission(user.Username, fiestaID)
+		log.Printf("canpost:%t isowner: %t", fiesta.CanPost, fiesta.IsOwner)
 	}
 
+	fiesta.LikeCount = s.DB.LikeCount(fiestaID)
 	jsonResponse, err := json.Marshal(fiesta)
 
 	if err != nil {
