@@ -46,7 +46,7 @@ func (s *APIServer) handleGetImage(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (s *APIServer) handleRemoveImage(w http.ResponseWriter, r *http.Request) {
+func (s *APIServer) handleDeleteImage(w http.ResponseWriter, r *http.Request) {
 	log.Printf("We're here!")
 	if r.Method != http.MethodDelete {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

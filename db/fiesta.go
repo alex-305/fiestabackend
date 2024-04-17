@@ -46,21 +46,19 @@ func (db *DB) CreateFiesta(fiesta models.Fiesta) (string, error) {
 	return fiestaid, nil
 }
 
-func (db *DB) GetFiesta(fiestaDetails models.FiestaDetails) (models.Fiesta, error) {
+func (db *DB) GetFiesta(fiestaid string) (models.Fiesta, error) {
 	query := `
 	SELECT username, title, post_date FROM fiestas
-	WHERE username = $1
-	AND id = $2`
+	WHERE id = $1`
 
-	row := db.QueryRow(query, fiestaDetails.Username, fiestaDetails.FiestaID)
+	row := db.QueryRow(query, fiestaid)
 
 	fiesta := models.Fiesta{}
 
 	err := row.Scan(&fiesta.Username, &fiesta.Title, &fiesta.Post_date)
 
 	if err != nil {
-		log.Printf("username: %s, fiestaid: %s", fiestaDetails.Username, fiestaDetails.FiestaID)
-		log.Printf("first:%s", err)
+
 		return models.Fiesta{}, err
 	}
 
@@ -68,7 +66,7 @@ func (db *DB) GetFiesta(fiestaDetails models.FiestaDetails) (models.Fiesta, erro
 	SELECT url FROM images
 	WHERE fiestaid = $1`
 
-	rows, err := db.Query(query, fiestaDetails.FiestaID)
+	rows, err := db.Query(query, fiestaid)
 
 	if err != nil {
 		log.Printf("second:%s", err)
@@ -89,4 +87,19 @@ func (db *DB) GetFiesta(fiestaDetails models.FiestaDetails) (models.Fiesta, erro
 	}
 
 	return fiesta, nil
+}
+
+func (db *DB) RemoveFiesta(fiestaid string) error {
+	query := `
+	DELETE FROM fiestas
+	WHERE id = $1`
+
+	_, err := db.Exec(query, fiestaid)
+
+	if err != nil {
+		log.Printf("%s", err)
+		return err
+	}
+
+	return nil
 }

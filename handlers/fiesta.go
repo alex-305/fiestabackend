@@ -55,7 +55,7 @@ func (s *APIServer) handlePostFiesta(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := pathResponse{
-		Path: "/user/" + fiesta.Username + "/fiesta/" + fiestaid,
+		Path: "/fiesta/" + fiestaid,
 	}
 
 	JSONresponse, err := json.Marshal(response)
@@ -71,21 +71,16 @@ func (s *APIServer) handlePostFiesta(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *APIServer) handleGetFiesta(w http.ResponseWriter, r *http.Request) {
+	log.Printf("HERE")
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	vars := mux.Vars(r)
-	username := vars["username"]
 	fiestaID := vars["fiestaID"]
 
-	fiestaDetails := models.FiestaDetails{
-		Username: username,
-		FiestaID: fiestaID,
-	}
-
-	fiesta, err := s.DB.GetFiesta(fiestaDetails)
+	fiesta, err := s.DB.GetFiesta(fiestaID)
 
 	if err != nil {
 		log.Printf("%s", err)
@@ -117,6 +112,46 @@ func (s *APIServer) handleGetFiesta(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
+
+}
+
+func (s *APIServer) handleDeleteFiesta(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	vars := mux.Vars(r)
+	fiestaid := vars["fiestaid"]
+
+	token, err := helpers.GetToken(r)
+
+	if err != nil {
+		http.Error(w, "Could not find JWT token", http.StatusUnauthorized)
+		return
+	}
+
+	user, err := auth.ValidateToken(token, s.DB)
+
+	if err != nil {
+		http.Error(w, "Could not validate token", http.StatusUnauthorized)
+		return
+	}
+
+	perms := auth.GetPermissions(user.Username, fiestaid, s.DB)
+
+	if !perms.IsOwner {
+		http.Error(w, "User does not have access to this resource", http.StatusUnauthorized)
+		return
+	}
+
+	err = s.DB.RemoveFiesta(fiestaid)
+
+	if err != nil {
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 
 }
 
@@ -178,6 +213,8 @@ func (s *APIServer) handleGetFiestaList(w http.ResponseWriter, r *http.Request) 
 		fiestas, err = s.DB.GetFollowingFiestas(username)
 	case "latest":
 		fiestas, err = s.DB.GetLatestFiestas(username)
+	case "popular":
+		fiestas, err = s.DB.GetPopularFiestas()
 
 	}
 
