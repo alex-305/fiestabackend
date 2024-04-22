@@ -41,3 +41,25 @@ func (db *DB) UnfollowUser(follower, followee string) error {
 
 	return nil
 }
+
+func (db *DB) FollowerCount(user string) int {
+	query := `
+	SELECT COUNT(*)
+	FROM user_follows_user
+	WHERE followee = $1`
+
+	var count int
+	_ = db.QueryRow(query, user).Scan(&count)
+	return count
+}
+
+func (db *DB) FollowingCount(user string) int {
+	query := `
+	SELECT COUNT(*)
+	FROM user_follows_user
+	WHERE follower = $1`
+
+	var count int
+	_ = db.QueryRow(query, user).Scan(&count)
+	return count
+}

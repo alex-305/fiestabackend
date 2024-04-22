@@ -12,9 +12,11 @@ import (
 )
 
 type userProfile struct {
-	User        models.User
-	CanEdit     bool
-	IsFollowing bool
+	User           models.User
+	CanEdit        bool
+	IsFollowing    bool
+	FollowerCount  int
+	FollowingCount int
 }
 
 func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) {
@@ -51,10 +53,15 @@ func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	followerCount := s.DB.FollowerCount(username)
+	followingCount := s.DB.FollowingCount(username)
+
 	var userProf userProfile = userProfile{
-		User:        user,
-		CanEdit:     canEdit,
-		IsFollowing: isFollowing,
+		User:           user,
+		CanEdit:        canEdit,
+		IsFollowing:    isFollowing,
+		FollowerCount:  followerCount,
+		FollowingCount: followingCount,
 	}
 
 	userJSON, err := json.Marshal(userProf)
