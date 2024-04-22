@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/alex-305/fiestabackend/models"
 )
@@ -72,19 +73,22 @@ func (db *DB) GetPopularFiestas() ([]models.SmallFiesta, error) {
 	AS i ON f.id = i.fiestaid
 	JOIN comments c ON f.id = c.fiestaid
 	JOIN user_likes_fiesta l ON f.id = l.fiestaid
+	WHERE f.post_date > $1
 	GROUP BY f.title, f.username, f.id, f.post_date, i.url
 	ORDER BY COUNT(l.username) + COUNT(c.id) DESC
 	LIMIT 50;`
 
-	return db.GetFiestaList(query, "")
+	sevenDaysAgo := (time.Now().AddDate(0, 0, -7)).Format(time.DateTime)
+
+	return db.GetFiestaList(query, sevenDaysAgo)
 
 }
 
-func (db *DB) GetFiestaList(query, username string) ([]models.SmallFiesta, error) {
+func (db *DB) GetFiestaList(query, param string) ([]models.SmallFiesta, error) {
 	var rows *sql.Rows
 	var err error
-	if username != "" {
-		rows, err = db.Query(query, username)
+	if param != "" {
+		rows, err = db.Query(query, param)
 	} else {
 		rows, err = db.Query(query)
 	}
