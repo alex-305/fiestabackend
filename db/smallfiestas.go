@@ -71,8 +71,8 @@ func (db *DB) GetPopularFiestas() ([]models.SmallFiesta, error) {
 		GROUP BY fiestaid
 	) 
 	AS i ON f.id = i.fiestaid
-	JOIN comments c ON f.id = c.fiestaid
-	JOIN user_likes_fiesta l ON f.id = l.fiestaid
+	LEFT JOIN comments c ON f.id = c.fiestaid
+	LEFT JOIN user_likes_fiesta l ON f.id = l.fiestaid
 	WHERE f.post_date > $1
 	GROUP BY f.title, f.username, f.id, f.post_date, i.url
 	ORDER BY COUNT(l.username) + COUNT(c.id) DESC
