@@ -1,4 +1,4 @@
-# Fiesta.Pics Frontend - Social media platform for parties!
+# Fiesta.Pics Backend - Social media platform for parties!
 
 ## Frontend - https://github.com/alex-305/fiestafrontend
 
